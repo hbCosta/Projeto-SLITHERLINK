@@ -45,7 +45,7 @@ class Board:
         self.grid = grid
         self.rows = len(grid)
         self.columns = len(grid[0])
-        
+
 
     def adjacent_cell(self, cell:tuple) -> list:
         """Devolve uma lista das células que fazem
@@ -143,7 +143,8 @@ if __name__ == "__main__":
     # Usar uma técnica de procura para resolver a instância,
     # Retirar a solução a partir do nó resultante,
     # Imprimir para o standard output no formato indicado.
-    pass
+    
+    # TESTES/DEBUG - a remover quando o projeto estiver implementado
     board = Board.parse_instance()
     print("--- TESTE 1: LEITURA DO TABULEIRO ---\n")
     print(f"Tabuleiro lido: {board.rows} linhas x {board.columns} colunas")
