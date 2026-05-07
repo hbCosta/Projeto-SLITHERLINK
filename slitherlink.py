@@ -41,39 +41,64 @@ class SlitherlinkState:
 
 class Board:
     """Representação interna de um tabuleiro de Slitherlink."""
+    def __init__(self, grid):
+        self.grid = grid
+        self.rows = len(grid)
+        self.columns = len(grid[0])
+        
 
     def adjacent_cell(self, cell:tuple) -> list:
         """Devolve uma lista das células que fazem
         fronteira com a célula enviada no argumento"""
+        row, col = cell
+        adjacentes = []
+        if row > 0:
+            adjacentes.append((row-1, col))
+        if row < self.rows -1:
+            adjacentes.append((row+1, col))
+        if col > 0:
+            adjacentes.append((row, col-1))
+        if col < self.columns -1:
+            adjacentes.append((row, col+1))
+        return adjacentes
+
         #TODO
         pass
 
     def get_cell_edges(self, row:int, column:int) -> list:
         """Devolve os arestas da célula enviada no argumento"""
+        arestas = [
+            ('h', row, column),
+            ('h', row + 1, column),
+            ('v', row, column),
+            ('v', row, column + 1)
+        ]
+        return arestas
+
         #TODO
         pass
 
     def get_active_edges(self, row:int, column:int) -> list:
         """Devolve o número de arestas ativas"""
-        #TODO
-        pass
+        return sum(1 for e in self.get_cell_edges(row, column) if self.edges[e] ==1)
 
 
     @staticmethod
     def parse_instance():
         """Lê o test do standard input (stdin) que é passado como argumento
         e retorna uma instância da classe Board.
-
         Por exemplo:
             $ python3 pipe.py < test-01.txt
 
             > from sys import stdin
             > line = stdin.readline().split()
         """
-        # TODO
-        pass
-
-    # TODO: outros metodos da classe
+        grid = [
+            [int(val) if val.isdigit() else None for val in line.split()]
+            for line in stdin
+            if line.strip()
+        ]
+        return Board(grid)
 
 class Slitherlink(Problem):
     def __init__(self, board: Board, gui=None):
@@ -119,10 +144,22 @@ if __name__ == "__main__":
     # Retirar a solução a partir do nó resultante,
     # Imprimir para o standard output no formato indicado.
     pass
+    board = Board.parse_instance()
+    print("--- TESTE 1: LEITURA DO TABULEIRO ---\n")
+    print(f"Tabuleiro lido: {board.rows} linhas x {board.columns} colunas")
+    print("Conteúdo: \n")
+    for linha in board.grid:
+        print(f"{linha}")
 
+    print("\n--- TESTE 2: CÉLULAS ADJACENTES ---\n")
+    print("Vizinhos de (0, 0):", board.adjacent_cell((0, 0)))
+    print("Vizinhos de (2, 2):", board.adjacent_cell((2, 2)))
 
+    ultima_linha = board.rows - 1
+    ultima_coluna = board.columns - 1
+    print("Vizinhos de (ultima_linha, ultima_coluna):", board.adjacent_cell((ultima_linha, ultima_coluna)))
+    print("\n")
 
-
-
-
-
+    print("\n--- TESTE 3: ARESTAS DA CÉLULA ---")
+    for aresta in board.get_cell_edges(2, 1):
+        print(" ->",aresta)
