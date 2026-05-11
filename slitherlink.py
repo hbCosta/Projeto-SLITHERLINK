@@ -46,6 +46,23 @@ class Board:
         self.rows = len(grid)
         self.columns = len(grid[0])
 
+        # Inicializar arestas
+        self.edges = {}
+        for row in range(self.rows+1):
+            for col in range(self.columns):
+                self.edges[('h', row, col)] = 0
+        for row in range(self.rows):
+            for col in range(self.columns + 1):
+                self.edges[('v', row, col)] = 0
+        
+
+        # Define que céculas com 0 não pode ter arestas 
+        for row in range(self.rows):
+            for col in range(self.columns):
+                if self.grid[row][col] == 0:
+                    for edge in self.get_cell_edges(row, col):
+                        self.edges[edge] = -1
+
 
     def adjacent_cell(self, cell:tuple) -> list:
         """Devolve uma lista das células que fazem
@@ -103,15 +120,27 @@ class Board:
 class Slitherlink(Problem):
     def __init__(self, board: Board, gui=None):
         """O construtor especifica o estado inicial."""
-        # TODO
-        pass
+        initial_state = SlitherlinkState(board)
+        super().__init__(initial_state)
+        self.gui = gui    
 
 
     def actions(self, state: SlitherlinkState):
         """Retorna uma lista de ações que podem ser executadas a
         partir do estado passado como argumento."""
-        # TODO
-        pass
+        acoes_possiveis = []
+
+        for aresta, valor in state.board.edges.items():
+            if valor == 0:
+                acoes_possiveis.append(aresta)
+                ...
+            
+        ...
+                    
+
+
+
+
 
 
     def result(self, state: SlitherlinkState, action):
@@ -164,3 +193,15 @@ if __name__ == "__main__":
     print("\n--- TESTE 3: ARESTAS DA CÉLULA ---")
     for aresta in board.get_cell_edges(2, 1):
         print(" ->",aresta)
+    
+    print("\n--- TESTE 4: ESTADO DAS ARESTAS ---")
+    print("Arestas da célula (0,0) ")
+    for aresta in board.get_cell_edges(0, 0):
+        print(f"  {aresta} -> {board.edges[aresta]}") 
+
+    print("\nArestas da célula (0,2)")
+    for aresta in board.get_cell_edges(0, 2):
+        print(f"  {aresta} -> {board.edges[aresta]}") 
+
+    print("\nArestas ativas em (0,0):", board.get_active_edges(0, 0))  # deve ser 0
+    print("Arestas ativas em (0,2):", board.get_active_edges(0, 2))  # deve ser 0
