@@ -64,6 +64,15 @@ class Board:
                         self.edges[edge] = -1
 
 
+    def copy(self):
+        new_board = Board.__new__(Board)
+        new_board.grid = self.grid
+        new_board.rows = self.rows
+        new_board.columns = self.columns
+        new_board.edges = dict(self.edges)
+        return new_board
+
+
     def adjacent_cell(self, cell:tuple) -> list:
         """Devolve uma lista das células que fazem
         fronteira com a célula enviada no argumento"""
@@ -132,10 +141,12 @@ class Slitherlink(Problem):
 
         for aresta, valor in state.board.edges.items():
             if valor == 0:
-                acoes_possiveis.append(aresta)
-                ...
-            
-        ...
+                acoes_possiveis.append((aresta, 1))
+                acoes_possiveis.append((aresta, -1))
+                return acoes_possiveis
+
+        return acoes_possiveis
+         
                     
 
 
@@ -148,15 +159,21 @@ class Slitherlink(Problem):
         'state' passado como argumento. A ação a executar deve ser uma
         das presentes na lista obtida pela execução de
         self.actions(state)."""
-        # TODO
-        pass
+
+        new_board = state.board.copy()
+        aresta, valor = action
+        new_board.edges[aresta] = valor
+        return SlitherlinkState(new_board)
+
+
+
+        
 
     def goal_test(self, state: SlitherlinkState):
         """Retorna True se e só se o estado passado como argumento é
         um estado objetivo. Deve verificar se todas as posições do tabuleiro
         estão preenchidas de acordo com as regras do problema."""
-        # TODO
-        pass
+        
 
     def h(self, node: Node):
         """Função heuristica utilizada para a procura A*."""
@@ -205,3 +222,17 @@ if __name__ == "__main__":
 
     print("\nArestas ativas em (0,0):", board.get_active_edges(0, 0))  # deve ser 0
     print("Arestas ativas em (0,2):", board.get_active_edges(0, 2))  # deve ser 0
+
+    print("\n--- TESTE 5: RESULT ---\n")
+    problema = Slitherlink(board)
+    acoes = problema.actions(problema.initial)
+    print(f"Ações possíveis: {acoes}")
+
+    novo_estado = problema.result(problema.initial, acoes[0])
+    aresta,valor = acoes[0]
+    
+    print(f"Aresta {aresta} no estado inicial: {problema.initial.board.edges[aresta]}")  # deve ser 0
+    print(f"Aresta {aresta} no novo estado: {novo_estado.board.edges[aresta]}")           # deve ser 1
+
+    # Garante que o estado inicial não foi alterado
+    print(f"Estado inicial não foi modificado: {problema.initial.board.edges[aresta] == 0}")  # deve ser True
