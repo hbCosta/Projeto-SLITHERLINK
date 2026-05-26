@@ -7,7 +7,7 @@
 # 106372 Diogo Geria
 # 119449 Humberto Costa
 
-import random, copy
+import random, copy, time, sys
 from sys import stdin
 from collections import defaultdict
 
@@ -704,13 +704,25 @@ class Slitherlink(Problem):
         # Verificar se as arestas ativas formam um único ciclo
         return board.has_single_loop()
     
-    
-
     def h(self, node: Node):
-        """Função heuristica utilizada para a procura A*."""
-        # TODO
-        pass
+        board = node.state.board
+        total = 0
 
+        indecisas = sum(1 for v in board.edges.values() if v == 0)
+
+        insatisfeitas = 0
+        for row in range(board.rows):
+            for col in range(board.columns):
+                valor_celula = board.grid[row][col]
+                if valor_celula is not None:
+                    if board.get_active_edges(row, col) != valor_celula:
+                        insatisfeitas += 1
+
+        total = indecisas + insatisfeitas * 2
+        return total
+
+    
+    
 
 
 if __name__ == "__main__":
@@ -727,14 +739,18 @@ if __name__ == "__main__":
     
     problem = Slitherlink(board)
 
+    inicio = time.time()
+    #goal_node = depth_first_tree_search(problem)
+    goal_node = astar_search(problem)
+    fim = time.time()
    
-    goal_node = depth_first_tree_search(problem)
-
    
     if goal_node is not None:
 
        
         goal_node.state.board.print_instance()
+        print(f"\nTempo de execução: {fim - inicio:.3f}s", file=sys.stderr)
+
 
     else:
         print("No solution found")
