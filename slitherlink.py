@@ -302,6 +302,9 @@ class Board:
                     vertices_to_check.update(
                         self.edge_vertices(e)
                     )
+
+        if self.has_closed_subloop():
+            return False
     
         return True
         
@@ -379,8 +382,60 @@ class Board:
                         
         return True
     
+
     
-                        
+    def has_closed_subloop(self):
+        active_edges = [e for e, value in self.edges.items() if value == 1]
+
+        if not active_edges:
+            return False
+
+        graph = {}
+
+        for edge in active_edges:
+            v1, v2 = self.edge_vertices(edge)
+
+            if v1 not in graph:
+                graph[v1] = []
+
+            if v2 not in graph:
+                graph[v2] = []
+
+            graph[v1].append(v2)
+            graph[v2].append(v1)
+
+        visited = set()
+
+        for start in graph:
+            if start in visited:
+                continue
+
+            stack = [start]
+            component = set()
+
+            while stack:
+                vertex = stack.pop()
+
+                if vertex in component:
+                    continue
+
+                component.add(vertex)
+
+                for neighbor in graph[vertex]:
+                    if neighbor not in component:
+                        stack.append(neighbor)
+
+            visited.update(component)
+
+            # Se esta componente é um ciclo fechado
+            if all(len(graph[v]) == 2 for v in component):
+
+                # Só é inválido se houver outro pedaço ativo fora deste ciclo
+                if len(component) < len(graph):
+                    return True
+
+        return False
+                 
     
     def has_single_loop(self):
         active_edges = [e for e, value in self.edges.items() if value == 1]
@@ -434,30 +489,28 @@ class Board:
     
         
     def print_instance(self):
-        """Imprime o tabuleiro no formato de output pedido."""
 
         for row in range(self.rows):
-    
+
             line = []
-    
+
             for col in range(self.columns):
-    
+
                 edges = self.get_cell_edges(row, col)
-    
+
                 values = []
-    
+
                 for e in edges:
-    
+
                     if self.edges[e] == 1:
                         values.append("1")
-    
                     else:
                         values.append("0")
-    
+
                 line.append("".join(values))
-    
-            print(" ".join(line))
-            
+
+            print("\t".join(line))
+                
 
 
     @staticmethod
@@ -544,14 +597,14 @@ class Slitherlink(Problem):
     
                 missing = value - len(active)
     
-                # Estado impossível
+               
                 if missing < 0:
                     return []
     
                 if missing > len(unknown):
                     return []
     
-                # Nada para decidir nesta célula
+                
                 if len(unknown) == 0:
                     continue
     
@@ -668,23 +721,25 @@ if __name__ == "__main__":
     # Imprimir para o standard output no formato indicado.
     
 
-    # Ler tabuleiro
+   
     board = Board.parse_instance()
 
-    # Criar problema
+    
     problem = Slitherlink(board)
 
-    # Resolver
+   
     goal_node = depth_first_tree_search(problem)
 
-    # Verificar se encontrou solução
+   
     if goal_node is not None:
 
-        # Imprimir solução
+       
         goal_node.state.board.print_instance()
 
     else:
         print("No solution found")
+
+
 
 
 
